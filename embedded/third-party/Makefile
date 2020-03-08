@@ -75,7 +75,7 @@ clean-paho.mqtt.c:
 	$(MAKE) -C $(EMBEDDED_BUILD)/$(patsubst clean-%,%,$@)/build clean
 
 .PHONY: build-paho.mqtt.cpp
-build-paho.mqtt.cpp:
+build-paho.mqtt.cpp: build-paho.mqtt.c
 	@$(call mkstddirs,$(EMBEDDED_BUILD)/$(patsubst build-%,%,$@))
 	rsync -azH --numeric-ids $(patsubst build-%,%,$@)/ $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/
 	cd $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/ && cmake . \
