@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" sizes="180x180" href="/graphics/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/graphics/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/graphics/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="msapplication-TileColor" content="#2b5797">
+<meta name="theme-color" content="#ffffff">
+<link href="/css/site-style.css" rel="stylesheet" type="text/css">
+<script src="/js/paho-mqtt.js"></script>
+<script type="text/javascript">
+	document.addEventListener('DOMContentLoaded', function() {
+
+		var pahoClient;
+		var lwtMessage;
+		var enableEditor = false;
+		var topicBase = "/us/uchat";
+		var uuid = uuidv4();
+		var message = "Client ("+ uuid +")";
+		var textArea = document.getElementById("mqtt-chat-box");
+
+		function onConnect() {
+			// Once a connection has been made, make a subscription and send a message.
+			console.log(message + " Connected!");
+			pahoClient.subscribe(
+				topicBase + "/pub",
+				{
+					qos:0,
+					onSuccess:onSubscribeSuccess,
+					onFailure:onSubscribeFail
+				}
+			);
+			if(enableEditor === true)
+			{
+				textArea.disabled = false;
+			}
+		};
+
+		function onConnectionLost(responseObject) {
+			if (responseObject.errorCode !== 0) {
+				console.log("onConnectionLost:"+responseObject.errorMessage);
+			}
+		};
+
+		function onConnectFailed() {
+			// Once a connection has been made, make a subscription and send a message.
+			console.log("onFailed");
+		};
+
+		function sendKeyEvent(key, start, end)
+		{
+			if(enableEditor === true) {
+				textArea.disabled = true;
+			}
+
+			var textUpdate = new Object();
+			textUpdate.name = "update";
+			textUpdate.key = key;
+			textUpdate.startPosition = start;
+			textUpdate.endPosition = end;
+			var textUpdateJsonString = JSON.stringify(textUpdate);
+
+			var message = new Paho.Message(textUpdateJsonString);
+			message.destinationName = topicBase + "/pub";
+			pahoClient.send(message);
+			return true;
+		}
+
+		textArea.onkeydown = function(evt) {
+			if (evt.key === "Backspace" || evt.key === "Delete")
+			{
+				sendKeyEvent(evt.key, getSelectionStart(evt), getSelectionEnd(evt));
+			}
+		}
+
+		textArea.onkeypress = function(evt) {
+			sendKeyEvent(evt.key, getSelectionStart(evt), getSelectionEnd(evt));
+		};
+
+		function getSelectionStart(evt) {
+			if (evt.target.createTextRange) {
+				var r = document.selection.createRange().duplicate()
+				r.moveEnd('character', evt.target.value.length)
+				if (r.text == '') {
+					return evt.target.value.length
+				}
+				return evt.target.value.lastIndexOf(r.text)
+			} else {
+				return evt.target.selectionStart
+			}
+		}
+
+		function getSelectionEnd(evt) {
+			if (evt.target.createTextRange) {
+				var r = document.selection.createRange().duplicate()
+				r.moveStart('character', -evt.target.value.length)
+				return r.text.length
+			}
+			else {
+				return evt.target.selectionEnd
+			}
+		}
+
+		function onMessageDelivered() {
+			if(enableEditor === true) {
+				textArea.disabled = false;
+			}
+		};
+
+		function onSubscribeSuccess() {
+			console.log("onSubscribeSuccess");
+		};
+
+		function onSubscribeFail() {
+			console.log("onSubscribeFail");
+		};
+
+		function onMessageArrived(message) {
+			var jsonObject = JSON.parse(message.payloadString);
+			console.log("onMessageArrived:"+ message.payloadString);
+			if(jsonObject.name == "update")
+			{
+				console.log("onSubscribeFail:", jsonObject);
+				if (jsonObject.key == "Backspace")
+				{
+					if(jsonObject.startPosition > 0)
+					{
+						textArea.value = (
+							textArea.value.slice(0, jsonObject.startPosition - 1) +
+							textArea.value.slice(jsonObject.startPosition)
+						);
+					}
+				}
+				else if (jsonObject.key == "Delete")
+				{
+					if(jsonObject.startPosition < textArea.value.length)
+					{
+						textArea.value = (
+							textArea.value.slice(0, jsonObject.startPosition) +
+							textArea.value.slice(jsonObject.startPosition + 1)
+						);
+					}
+				}
+				else if (jsonObject.key == "Enter")
+				{
+					textArea.value = (
+						textArea.value.slice(0, jsonObject.startPosition) +
+						'\r' +
+						textArea.value.slice(jsonObject.startPosition)
+					);
+				}
+				else
+				{
+					textArea.value = (
+						textArea.value.slice(0, jsonObject.startPosition) +
+						jsonObject.key +
+						textArea.value.slice(jsonObject.startPosition)
+					);
+				}
+			}
+		};
+
+		function onTrace(message) {
+			console.log(message);
+		}
+
+		function uuidv4() {
+			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+				return v.toString(16);
+			});
+		}
+
+		lwtMessage = new Paho.Message(message + " Disconnected!");
+		lwtMessage.qos = 2;
+		lwtMessage.topic = topicBase + "/association/events";
+
+		pahoClient = new Paho.Client("broker.mqttdashboard.com", 8000, uuid);
+		pahoClient.onConnectionLost = onConnectionLost;
+		pahoClient.onMessageArrived = onMessageArrived;
+		pahoClient.onMessageDelivered = onMessageDelivered;
+		pahoClient.trace = onTrace;
+
+		pahoClient.connect( {
+			willMessage:lwtMessage,
+			keepAliveInterval: 60,
+			cleanSession:true,
+			useSSL:false,
+			onSuccess:onConnect,
+			onFailure:onConnectFailed,
+			reconnect:true
+		});
+
+	}, false);
+</script>
+<title>Distributed Text System - Viewer</title>
+</head>
+<body>
+<!-- Note -->
+<!-- Header -->
+<div class="header">
+	<div class="header-logo">
+		<a href="/">
+			<img src="/graphics/logo.png" alt="Distributed Text System Logo">
+			<span>Distributed Text System</span>
+		</a>
+	</div>
+	<!-- Navigation Bar -->
+	<div class="navbar">
+		<a href="/about/">About</a>
+		<a href="/editor/">Editor</a>
+		<a href="/viewer/">Viewer</a>
+	</div>
+</div>
+<!-- The flexible grid (content) -->
+<div class="row">
+	<div class="main content-shadow-top content-round-top">
+		<h2>Chat Text</h2>
+		<textarea id="mqtt-chat-box" disabled style="height: 400px; width: 100%; overflow-y: auto;"></textarea>
+	</div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+	<div class="footer-copyright">
+		<span>Copyright © 2020 Alexander Boone<span>
+	</div>
+</div>
+</body>
+
+</html>
