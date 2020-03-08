@@ -1,0 +1,15 @@
+[submodule "embedded/third-party/paho.mqtt.c"]
+	path = embedded/third-party/paho.mqtt.c
+	url = https://github.com/ajb042487/paho.mqtt.c.git
+[submodule "embedded/third-party/paho.mqtt.cpp"]
+	path = embedded/third-party/paho.mqtt.cpp
+	url = https://github.com/ajb042487/paho.mqtt.cpp.git
+[submodule "embedded/third-party/rapidjson"]
+	path = embedded/third-party/rapidjson
+	url = https://github.com/ajb042487/rapidjson.git
+[submodule "embedded/third-party/civetweb"]
+	path = embedded/third-party/civetweb
+	url = https://github.com/ajb042487/civetweb.git
+[submodule "js/paho.mqtt.javascript"]
+	path = js/paho.mqtt.javascript
+	url = https://github.com/ajb042487/paho.mqtt.javascript.git
