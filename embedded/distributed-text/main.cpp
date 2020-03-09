@@ -52,6 +52,12 @@ int main(int argc, char** argv)
 	{
 		printf("Error: The incorrect number of arguments were provided\n");
 		printf("./distributed-text <webserver_port> <configuration_file_path.json>\n");
+		printf("\tconfiguration_file_path.json should contain a json object similar to the following elements:\n");
+		printf("\t\t{\"mqtt_hostname\":\"broker.mqttdashboard.com\",\"mqtt_port\":8000,\"inital_text_path\":\"intialText.txt\"}\n");
+		printf("\tconfiguration_file_path.json should contain a the following elements in the json object:\n");
+		printf("\t\t- mqtt_hostname: MQTT Broker Server Name.\n");
+		printf("\t\t- mqtt_port: MQTT Port to connect, ensure the specified port is enabled for websocket usage.\n");
+		printf("\t\t- inital_text_path: A path for retaining the latest information on the distributed-text system.\n");
 		exit(-1);
 	}
 
