@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 	}
 
 	webserverOptions.push_back("document_root");
-	webserverOptions.push_back(".");
+	webserverOptions.push_back("www");
 	WebServerManager webServer(webserverOptions);
 
 	SignalManager& manager = SignalManager::getInstance();
