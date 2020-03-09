@@ -24,11 +24,10 @@ build-civetweb:
 	mkdir -p $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/usr/lib
 	rsync -azH --numeric-ids $(patsubst build-%,%,$@)/ $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/
 	cd $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/ && \
-	$(MAKE) lib slib CC=$(CC) WITH_LUA_SHARED=1 WITH_DUKTAPE_SHARED=1 WITH_IPV6=1 WITH_WEBSOCKET=1 \
+	$(MAKE) lib CC=$(CC) WITH_LUA=1 WITH_DUKTAPE=1 WITH_IPV6=1 WITH_WEBSOCKET=1 \
 	WITH_SERVER_STATS=1 WITH_DEBUG=1 WITH_CPP=1 HTMLDIR=./html DOCUMENT_ROOT=./html \
 	PORTS=8080
 	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/*.a $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/usr/lib/
-	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/*.so $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/usr/lib/
 	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/include $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/usr/
 
 .PHONY: install-civetweb
@@ -64,7 +63,8 @@ clean-rapidjson:
 build-paho.mqtt.c:
 	@$(call mkstddirs,$(EMBEDDED_BUILD)/$(patsubst build-%,%,$@))
 	rsync -azH --numeric-ids $(patsubst build-%,%,$@)/ $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/
-	cd $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/ && cmake . -bBuild -H. -DPAHO_WITH_SSL=ON -DPAHO_ENABLE_TESTING=OFF
+	cd $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/ && cmake . -bBuild -H. -DPAHO_WITH_SSL=ON \
+	-DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=TRUE
 	$(MAKE) all -C $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build
 	$(MAKE) install -C $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build DESTDIR=$(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/
 
@@ -83,9 +83,10 @@ clean-paho.mqtt.c:
 build-paho.mqtt.cpp: build-paho.mqtt.c
 	@$(call mkstddirs,$(EMBEDDED_BUILD)/$(patsubst build-%,%,$@))
 	rsync -azH --numeric-ids $(patsubst build-%,%,$@)/ $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/
-	cd $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/ && cmake . \
+	cd $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/ && cmake . -bBuild -H. -DPAHO_WITH_SSL=ON \
+	-DPAHO_BUILD_SHARED=FALSE -DPAHO_BUILD_STATIC=TRUE \
 	-DPAHO_MQTT_C_INCLUDE_DIRS=$(EMBEDDED_BUILD)/$(patsubst build-%pp,%,$@)/staging/usr/local/include/ \
-	-DPAHO_MQTT_C_LIBRARIES=$(EMBEDDED_BUILD)/$(patsubst build-%pp,%,$@)/staging/usr/local/lib/libpaho-mqtt3c.so
+	-DPAHO_MQTT_C_LIBRARIES=$(EMBEDDED_BUILD)/$(patsubst build-%pp,%,$@)/staging/usr/local/lib/libpaho-mqtt3c.a
 	$(MAKE) all -C $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build
 	$(MAKE) install -C $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build DESTDIR=$(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/
 
