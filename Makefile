@@ -44,5 +44,8 @@ clean-html:
 
 .PHONY: distributed-text-application
 distributed-text-application: build-embedded build-js build-html
-	@mkdir -p $(OUTPUT)/$@
+	mkdir -p $(OUTPUT)/$@/www/
+	rsync -azH --numeric-ids $(HTML_STAGING)/ $(OUTPUT)/$@/www/
+	rsync -azH --numeric-ids $(JS_STAGING)/ $(OUTPUT)/$@/www/js/
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst %-application,%,$@)/images/*.elf $(OUTPUT)/$@/
 	

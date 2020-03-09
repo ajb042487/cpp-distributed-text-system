@@ -21,12 +21,12 @@ clean:
 .PHONY: build-distributed-text-html
 build-distributed-text-html:
 	@$(call mkstddirs,$(HTML_BUILD)/$(patsubst build-%,%,$@))
-	rsync -azH --numeric-ids $(patsubst build-%,%,$@)/ $(HTML_BUILD)/$(patsubst build-%,%,$@)/build/
-	rsync -azH --numeric-ids $(HTML_BUILD)/$(patsubst build-%,%,$@)/build/src/*js $(HTML_STAGING)/
+	rsync -azH --numeric-ids --exclude=Makefile $(THIS_DIRECTORY_PATH)/ $(HTML_BUILD)/$(patsubst build-%,%,$@)/build/
+	rsync -azH --numeric-ids $(HTML_BUILD)/$(patsubst build-%,%,$@)/build/ $(HTML_BUILD)/$(patsubst build-%,%,$@)/staging/
 
 .PHONY: install-distributed-text-html
 install-distributed-text-html:
-	#rsync -azH --numeric-ids $(HTML_BUILD)/$(patsubst build-%,%,$@)/staging/lib/
+	rsync -azH --numeric-ids $(HTML_BUILD)/$(patsubst install-%,%,$@)/staging/ $(HTML_STAGING)/
 
 .PHONY: clean-distributed-text-html
 clean-distributed-text-html:
