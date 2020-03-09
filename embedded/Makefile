@@ -8,10 +8,10 @@ include ../build-configuration.mk
 .PHONY: build
 build:
 	@$(MAKE) -C third-party build
+	@$(MAKE) -C third-party install
 
 .PHONY: install
 install:
-	@$(MAKE) -C third-party install
 
 .PHONY: clean
 clean:

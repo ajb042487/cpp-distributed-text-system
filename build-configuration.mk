@@ -12,9 +12,25 @@ OUTPUT=$(BUILD_CONFIGURATION_PATH)/output
 mkstddirs= mkdir -p $(1)/host && mkdir -p $(1)/build && mkdir -p $(1)/target && mkdir -p $(1)/images && mkdir -p $(1)/staging
 
 EMBEDDED=$(BUILD_CONFIGURATION_PATH)/embedded
-EMBEDDED_HOST=$(OUTPUT)/embedded/host
-EMBEDDED_BUILD=$(OUTPUT)/embedded/build
-EMBEDDED_TARGET=$(OUTPUT)/embedded/target
-EMBEDDED_IMAGES=$(OUTPUT)/embedded/images
-EMBEDDED_STAGING=$(OUTPUT)/embedded/staging
+EMBEDDED_OUTPUT=$(OUTPUT)/embedded
+EMBEDDED_HOST=$(EMBEDDED_OUTPUT)/host
+EMBEDDED_BUILD=$(EMBEDDED_OUTPUT)/build
+EMBEDDED_TARGET=$(EMBEDDED_OUTPUT)/target
+EMBEDDED_IMAGES=$(EMBEDDED_OUTPUT)/images
+EMBEDDED_STAGING=$(EMBEDDED_OUTPUT)/staging
 
+HTML=$(BUILD_CONFIGURATION_PATH)/html
+HTML_OUTPUT=$(OUTPUT)/html
+HTML_HOST=$(HTML_OUTPUT)/html/host
+HTML_BUILD=$(HTML_OUTPUT)/html/build
+HTML_TARGET=$(HTML_OUTPUT)/html/target
+HTML_IMAGES=$(HTML_OUTPUT)/html/images
+HTML_STAGING=$(HTML_OUTPUT)/html/staging
+
+JS=$(BUILD_CONFIGURATION_PATH)/js
+JS_OUTPUT=$(OUTPUT)/js
+JS_HOST=$(JS_OUTPUT)/host
+JS_BUILD=$(JS_OUTPUT)/build
+JS_TARGET=$(JS_OUTPUT)/target
+JS_IMAGES=$(JS_OUTPUT)/images
+JS_STAGING=$(JS_OUTPUT)/staging

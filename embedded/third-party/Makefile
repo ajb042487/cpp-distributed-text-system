@@ -7,16 +7,16 @@ include ../../build-configuration.mk
 
 .PHONY: build
 build:
-	@$(call mkstddirs,$(EMBEDDED_BUILD))
-	@$(MAKE) build-civetweb build-paho.mqtt.cpp
+	@$(call mkstddirs,$(EMBEDDED_OUTPUT))
+	@$(MAKE) build-civetweb build-paho.mqtt.cpp build-rapidjson
 
 .PHONY: install
 install:
-	@$(MAKE) install-civetweb install-paho.mqtt.cpp
+	@$(MAKE) install-civetweb install-paho.mqtt.cpp install-rapidjson
 
 .PHONY: clean
 clean:
-	@$(MAKE) clean-civetweb clean-paho.mqtt.cpp
+	@$(MAKE) clean-civetweb clean-paho.mqtt.c clean-paho.mqtt.cpp clean-rapidjson
 
 .PHONY: build-civetweb
 build-civetweb:
@@ -29,12 +29,13 @@ build-civetweb:
 	PORTS=8080
 	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/*.a $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/usr/lib/
 	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/*.so $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/usr/lib/
-	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/include $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build/include $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/usr/
 
 .PHONY: install-civetweb
 install-civetweb:
-	#rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/lib/
-	#rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/include/
+	@mkdir -p $(EMBEDDED_STAGING)/usr/lib
+	@mkdir -p $(EMBEDDED_STAGING)/usr/include
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/ $(EMBEDDED_STAGING)/
 
 .PHONY: clean-civetweb
 clean-civetweb:
@@ -50,8 +51,10 @@ build-rapidjson:
 
 .PHONY: install-rapidjson
 install-rapidjson:
-	#rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/lib/
-	#rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/include/
+	@mkdir -p $(EMBEDDED_STAGING)/usr/lib
+	@mkdir -p $(EMBEDDED_STAGING)/usr/include
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/usr/local/lib $(EMBEDDED_STAGING)/usr/
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/usr/local/include $(EMBEDDED_STAGING)/usr/
 
 .PHONY: clean-rapidjson
 clean-rapidjson:
@@ -67,8 +70,10 @@ build-paho.mqtt.c:
 
 .PHONY: install-paho.mqtt.c
 install-paho.mqtt.c:
-	#rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/lib/
-	#rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/include/
+	@mkdir -p $(EMBEDDED_STAGING)/usr/lib
+	@mkdir -p $(EMBEDDED_STAGING)/usr/include
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/usr/local/lib $(EMBEDDED_STAGING)/usr/
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/usr/local/include $(EMBEDDED_STAGING)/usr/
 
 .PHONY: clean-paho.mqtt.c
 clean-paho.mqtt.c:
@@ -85,9 +90,11 @@ build-paho.mqtt.cpp: build-paho.mqtt.c
 	$(MAKE) install -C $(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/build DESTDIR=$(EMBEDDED_BUILD)/$(patsubst build-%,%,$@)/staging/
 
 .PHONY: install-paho.mqtt.cpp
-install-paho.mqtt.cpp:
-	#rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/lib/
-	#rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/include/
+install-paho.mqtt.cpp: install-paho.mqtt.c
+	@mkdir -p $(EMBEDDED_STAGING)/usr/lib
+	@mkdir -p $(EMBEDDED_STAGING)/usr/include
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/usr/local/lib $(EMBEDDED_STAGING)/usr/
+	rsync -azH --numeric-ids $(EMBEDDED_BUILD)/$(patsubst install-%,%,$@)/staging/usr/local/include $(EMBEDDED_STAGING)/usr/
 
 .PHONY: clean-paho.mqtt.cpp
 clean-paho.mqtt.cpp:
